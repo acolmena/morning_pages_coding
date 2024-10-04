@@ -40,3 +40,28 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Falling effect for the text */
+.falling-note {
+  position: absolute;
+  top: 0; /* Start at the top */
+  color: black; 
+  font-weight: bold;
+  font-family: "Courier New", Courier, monospace; /* Matrix-like font */
+  font-size: 24px;
+  animation: fall 3s linear; /* Falling animation */
+  pointer-events: none; /* Prevent interaction with the falling text */
+  white-space: nowrap;
+}
+
+/* Keyframe animation to move text from top to bottom */
+@keyframes fall {
+  0% {
+    top: -10%; /* Start slightly above the visible area */
+    opacity: 1;
+  }
+  100% {
+    top: 110%; /* Move below the visible area */
+    opacity: 0; /* Fade out at the bottom */
+  }
+}
