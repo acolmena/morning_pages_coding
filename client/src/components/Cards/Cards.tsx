@@ -8,17 +8,33 @@ interface CardProps {
 }
 
 const Cards = (props: CardProps) => {
+  const id = props.title; 
   const [notes, setNotes] = useState<string[]>([]);
   const [singleNote, setSingleNote] = useState<string>("");
 
-  // Handle form submit to store note
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (singleNote) {
-      setNotes([...notes, singleNote]);
-      setSingleNote(""); // Reset input after submission
+      const newNotes = [...notes, singleNote];
+      setNotes(newNotes);
+      setSingleNote(""); // Reset input 
+      localStorage.setItem(`savedResponses-${id}`, JSON.stringify(newNotes)); // Save new notes
     }
   };
+
+  const handleDelete = (index: number) => {
+    const updatedResponses = notes.filter((_, i) => i !== index);
+    setNotes(updatedResponses);
+    localStorage.setItem(`savedResponses-${id}`, JSON.stringify(updatedResponses));
+  };
+
+  // load responses from local storage when component mounts
+  useEffect(() => {
+    const savedResponsesFromStorage = localStorage.getItem(`savedResponses-${id}`);
+    if (savedResponsesFromStorage) {
+      setNotes(JSON.parse(savedResponsesFromStorage));
+    }
+  }, [id]);
 
   // Function to generate falling text effect while typing
   useEffect(() => {
@@ -61,13 +77,13 @@ const Cards = (props: CardProps) => {
         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
           {props.description}
         </p>
-        {notes.map((note) => (
-                <ul className="list-disc">
-                    <li className="text-left transition ease-in-out delay-10 text-blue-500 hover:-translate-y-1 hover:scale-110 hover:text-indigo-500 hover:font-bold duration-300 mb-3 mx-5 font-normal">
-                    {note}
-                    </li>
-                </ul>
-            ))}
+        {notes.map((note, index) => (
+          <ul className="list-disc" key={index}>
+            <li className="text-left transition ease-in-out delay-10 text-stone-600 hover:cursor-pointer hover:-translate-y-1 hover:scale-110 hover:text-amber-700 hover:font-bold duration-300 mb-3 mx-5 font-normal" onClick={() => handleDelete(index)}>
+              {note}
+            </li>
+          </ul>
+        ))}
       </div>
       <div className="mb-6 mx-5">
         <form onSubmit={handleSubmit}>
@@ -82,10 +98,11 @@ const Cards = (props: CardProps) => {
           </div>
           <button
             type="submit"
-            className="text-white rounded-full bg-stone-500 hover:bg-stone-700 focus:ring-4 focus:outline-none focus:ring-stone-400 font-medium text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-stone-600 dark:hover:bg-stone-700 dark:focus:ring-stone-800"
+            className="text-white rounded-full mb-3 bg-stone-500 hover:bg-stone-700 focus:ring-4 focus:outline-none focus:ring-stone-400 font-medium text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-stone-600 dark:hover:bg-stone-700 dark:focus:ring-stone-800"
           >
             Add Note
           </button>
+         <p className="text-xs text-red-600 font-bold">Click note = delete</p>
         </form>
       </div>
     </div>
